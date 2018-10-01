@@ -1,0 +1,10 @@
+/.vs
+/DbAgnostic.MsSQL/bin
+/DbAgnostic.MsSQL/obj
+/DbAgnostic.MySQL/bin
+/DbAgnostic.MySQL/DbAgnostic.MySQL.csproj.user
+/DbAgnostic.MySQL/obj
+/DbAgnostic.Tests/bin
+/DbAgnostic.Tests/obj
+/DbAgnostic/bin
+/DbAgnostic/obj
