@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 
 namespace DbAgnostic.Tests
@@ -9,20 +10,31 @@ namespace DbAgnostic.Tests
     [TestFixture]
     public class DbAccessTest
     {
-        [Test]
-        public void Test()
+
+        IDbAccess _dbAccess;
+
+        public DbAccessTest()
         {
-            //TODO: set up test database 
-
-
-            IDbAccess db = DbAccessFactory.Build(() => new SqlConnection(""));
+            string con = ConfigurationHelper.GetConnectionString();
+            _dbAccess = DbAccessFactory.Build(() => new SqlConnection(con));
         }
 
 
-        //[Test]
-        //public void TestTest()
-        //{
-        //    Assert.True(false, "this is false...");
-        //}
+        [Test]
+        public void TestInsert()
+        {
+            _dbAccess.Execute("INSERT INTO [User] ([FirstName], [LastName], [EmailAddress]) VALUES (@FirstName, @LastName, @EmailAddress)",
+                new { FirstName = "Test", LastName = "User", EmailAddress = "testuser@dbagnostic.test" });
+        }
+
+        [Test]
+        public void TestSelect()
+        {
+            IEnumerable<dynamic> data = _dbAccess.Query<dynamic>("SELECT * FROM [User] WHERE [EmailAddress] = @EmailAddress", new { EmailAddress = "testuser@dbagnostic.test" });
+
+            Assert.IsNotNull(data);
+            Assert.IsTrue(data.Count() > 0);
+            Assert.IsTrue(data.First().FirstName == "Test");
+        }
     }
 }
