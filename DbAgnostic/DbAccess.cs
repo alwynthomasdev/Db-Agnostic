@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
 
 namespace DbAgnostic
 {
@@ -56,12 +55,12 @@ namespace DbAgnostic
         /// <summary>
         /// Runs an SQL query that returns multiple sets of data.
         /// </summary>
-        SqlMapper.GridReader QueryMultiple(IDbConnection con, string sql, object @params = null);
+        QueryMultipleResultReader QueryMultiple(IDbConnection con, string sql, object @params = null);
 
         /// <summary>
         /// Runs an SQL query that returns multiple sets of data. Used for running statements within a transaction.
         /// </summary>
-        SqlMapper.GridReader QueryMultiple(IDbConnection con, IDbTransaction tran, string sql, object @params = null);
+        QueryMultipleResultReader QueryMultiple(IDbConnection con, IDbTransaction tran, string sql, object @params = null);
     }
 
     /// <summary>
@@ -111,12 +110,12 @@ namespace DbAgnostic
         /// <summary>
         /// Runs an SQL query that returns multiple sets of data.
         /// </summary>
-        SqlMapper.GridReader QueryMultiple(IDbConnection con, string sql, object @params = null);
+        QueryMultipleResultReader QueryMultiple(IDbConnection con, string sql, object @params = null);
 
         /// <summary>
         /// Runs an SQL query that returns multiple sets of data. Used for running statements within a transaction.
         /// </summary>
-        SqlMapper.GridReader QueryMultiple(IDbConnection con, IDbTransaction tran, string sql, object @params = null);
+        QueryMultipleResultReader QueryMultiple(IDbConnection con, IDbTransaction tran, string sql, object @params = null);
     }
 
     #endregion
@@ -178,11 +177,12 @@ namespace DbAgnostic
             }
         }
 
-        public SqlMapper.GridReader QueryMultiple(IDbConnection con, string sql, object @params = null)
+        public QueryMultipleResultReader QueryMultiple(IDbConnection con, string sql, object @params = null)
         {
             try
             {
-                return con.QueryMultiple(sql, @params);
+                SqlMapper.GridReader rdr = con.QueryMultiple(sql, @params);
+                return new QueryMultipleResultReader(rdr);
             }
             catch (Exception ex)
             {
@@ -226,11 +226,12 @@ namespace DbAgnostic
             }
         }
 
-        public SqlMapper.GridReader QueryMultiple(IDbConnection con, IDbTransaction tran, string sql, object @params = null)
+        public QueryMultipleResultReader QueryMultiple(IDbConnection con, IDbTransaction tran, string sql, object @params = null)
         {
             try
             {
-                return con.QueryMultiple(sql, @params, transaction: tran);
+                SqlMapper.GridReader rdr = con.QueryMultiple(sql, @params, transaction: tran);
+                return new QueryMultipleResultReader(rdr);
             }
             catch (Exception ex)
             {

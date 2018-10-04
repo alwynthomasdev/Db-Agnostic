@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Text;
+﻿using System.Data.SqlClient;
 
-namespace DbAgnostic.MsSql
+namespace DbAgnostic
 {
     /// <summary>
     /// All instances of data access should be created using the factory
     /// </summary>
-    public static class DbAccessFactory
+    public static partial class DbAccessFactory
     {
         public static IDbAccess Build(string connectionString) =>
-            DbAgnostic.DbAccessFactory.Build(() => new SqlConnection(connectionString));
+            new DbAccess(() => new SqlConnection(connectionString));
 
         public static IDbAccess<T> Build<T>(string connectionString) =>
-            DbAgnostic.DbAccessFactory.Build<T>(() => new SqlConnection(connectionString));
+                new DbAccess<T>(() => new SqlConnection(connectionString));
 
         public static ICrudAccess<T> BuildCrud<T>(string connectionString) =>
-                new CrudAccess<T>(() => new SqlConnection(connectionString), new MsSqlGenerator<T>());
+            new CrudAccess<T>(() => new SqlConnection(connectionString), new MsSqlGenerator<T>());
     }
 }

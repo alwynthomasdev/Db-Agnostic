@@ -1,14 +1,11 @@
 ﻿using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace DbAgnostic.MySql
+namespace DbAgnostic
 {
     /// <summary>
     /// All instances of data access should be created using the factory
     /// </summary>
-    public static class DbAccessFactory
+    public static partial class DbAccessFactory
     {
         public static IDbAccess Build(string connectionString) =>
             new DbAccess(() => new MySqlConnection(connectionString));
