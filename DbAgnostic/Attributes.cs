@@ -4,18 +4,34 @@ namespace DbAgnostic
 {
     //TODO: document these
 
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class CrudAccessIncludeAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class CrudAccessPropertySettingsAttribute : Attribute
     {
-        public CrudAccessIncludeAttribute()
+        public CrudAccessPropertySettingsAttribute()
         {
-            IsID = false;
-            InsertID = false;
+            //default exclusion settings, never update or insert, but always select and be able to select/update by
+            Insert = false;
+            Update = false;
+            Select = true;
+            DoBy = true;
         }
 
-        public bool IsID { get; set; }
-        public bool InsertID { get; set; }
+        public bool Insert { get; set; }
+        public bool Update { get; set; }
+        public bool Select { get; set; }
+        public bool DoBy { get; set; }
+    }
 
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class CrudAccessKeyAttribute : Attribute
+    {
+        public CrudAccessKeyAttribute()
+        {
+            Insert = true;
+            Update = false;
+        }
+        public bool Insert { get; set; }
+        public bool Update { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

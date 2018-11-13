@@ -1,11 +1,11 @@
 ﻿using System.Data.SqlClient;
 
-namespace DbAgnostic
+namespace DbAgnostic.MsSQL
 {
     /// <summary>
     /// All instances of data access should be created using the factory
     /// </summary>
-    public static partial class DbAccessFactory
+    public static class DbAccessFactory
     {
         public static IDbAccess Build(string connectionString) =>
             new DbAccess(() => new SqlConnection(connectionString));

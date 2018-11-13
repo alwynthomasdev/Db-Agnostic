@@ -150,6 +150,68 @@ SELECT COUNT(*) AS [cnt] FROM [User] WHERE [EmailAddress] = @EmailAddress;
             _dbAccess.Execute("DELETE FROM [User] WHERE [EmailAddress] = @EmailAddress", new { EmailAddress = EmailAddress });
         }
 
+        [Test]
+        public void TestTransactionFail()
+        {
+            string uniqueValue = Guid.NewGuid().ToString();
+            string EmailAddress = uniqueValue + "@dbagnostic.test";
+
+            using (IDbConnection con = _dbAccess.GetConnection())
+            {
+                con.Open();
+                using (IDbTransaction trn = con.BeginTransaction())
+                {
+                    try
+                    {
+                        //insert a unique value into the database
+                        _dbAccess.Execute(con, trn, "INSERT INTO [User] ([FirstName], [LastName], [EmailAddress]) VALUES (@FirstName, @LastName, @EmailAddress)",
+                            new { FirstName = "Test", LastName = uniqueValue, EmailAddress = EmailAddress });
+                        throw new Exception("Test exception");
+                        //trn.Commit();//this will never commit
+                    }
+                    catch(Exception ex)
+                    {
+                        trn.Rollback();
+                    }
+                }
+            }
+            //try to get the data inserted in transaction 
+            IEnumerable<dynamic> data = _dbAccess.Query<dynamic>("SELECT * FROM [User] WHERE [EmailAddress] = @EmailAddress", new { EmailAddress = EmailAddress });
+
+            //check no data found
+            Assert.IsEmpty(data, "Data found with EmailAddress '{0}', data should not be committed in a rollback transaction", EmailAddress);
+        }
+
+        [Test]
+        public void TestTransactionSuccess()
+        {
+            string uniqueValue = Guid.NewGuid().ToString();
+            string EmailAddress = uniqueValue + "@dbagnostic.test";
+
+            using (IDbConnection con = _dbAccess.GetConnection())
+            {
+                con.Open();
+                using (IDbTransaction trn = con.BeginTransaction())
+                {
+                    //insert a unique value into the databasle
+                    _dbAccess.Execute(con, trn, "INSERT INTO [User] ([FirstName], [LastName], [EmailAddress]) VALUES (@FirstName, @LastName, @EmailAddress)",
+                        new { FirstName = "Test", LastName = uniqueValue, EmailAddress = EmailAddress });
+
+                    trn.Commit();
+                }
+            }
+
+            //get the data just inserted
+            IEnumerable<dynamic> data = _dbAccess.Query<dynamic>("SELECT * FROM [User] WHERE [EmailAddress] = @EmailAddress", new { EmailAddress = EmailAddress });
+
+            Assert.IsNotNull(data, "No data found (NULL) with EmailAddress '{0}'", EmailAddress);
+            Assert.IsTrue(data.Count() > 0, "0 records found with the EmailAddress '{0}'.", EmailAddress);
+            Assert.IsTrue(data.First().LastName == uniqueValue, "The LastName field for the data retrived does not match the expected value of '{0}'.", uniqueValue);
+
+            //clean up
+            _dbAccess.Execute("DELETE FROM [User] WHERE [EmailAddress] = @EmailAddress", new { EmailAddress = EmailAddress });
+        }
+
         //TODO: test all transactional stuff
 
         //[Test]

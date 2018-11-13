@@ -6,7 +6,7 @@ namespace DbAgnostic
     /// <summary>
     /// All instances of data access should be created using the factory
     /// </summary>
-    public static partial class DbAccessFactory
+    public static class DbAccessFactory
     {
         public static IDbAccess Build(Func<IDbConnection> fn) =>
             new DbAccess(fn);
