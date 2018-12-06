@@ -10,7 +10,7 @@ namespace DbAgnostic
         protected const char TAB = '\t';
 
         private string _TableName;
-        private List<PropertyConfiguration> _PropertyConfiguration { get; set; }
+        private List<PropertyConfiguration> _PropertyConfiguration;
 
         protected string TableName
         {
@@ -48,8 +48,9 @@ namespace DbAgnostic
 
                 if (keyAtr != null)
                 {
+                    //TODO: create support for multiple (composite) keys?
                     if (_PropertyConfiguration.Where(x => x.isKey).SingleOrDefault() != null)
-                        throw new DbAccessException($"Multiple keys specified on crud model. ");//TODO: create support for multiple keys?
+                        throw new DbAccessException($"Multiple keys specified on crud model. ");
 
                     cfg.isKey = true;
                     cfg.Insert = keyAtr.Insert;
@@ -226,12 +227,22 @@ namespace DbAgnostic
             get
             {
                 string output = _PropertyConfiguration
-                    .Where(x => x.Select)
+                    .Where(x => x.isKey)
                     .Select(x => x.Name)
                     .SingleOrDefault();
                 if (string.IsNullOrWhiteSpace(output))
                     throw new DbAccessException($"There is no CrudAccessKeyAttribute for '{typeof(T).Name}'.");
                 else return output;
+            }
+        }
+        protected bool IdentityInsert
+        {
+            get
+            {
+                return _PropertyConfiguration
+                    .Where(x => x.isKey)
+                    .Select(x => x.Insert)
+                    .SingleOrDefault();
             }
         }
         protected string[] SelectList
@@ -287,7 +298,6 @@ namespace DbAgnostic
             throw new DbAccessException($"Property '{propertyName}' is not a member of the '{typeof(T).Name}' property list.");
         }
 
-        //TODO: comment
         protected class PropertyConfiguration
         {
             public string Name { get; set; }
@@ -295,6 +305,9 @@ namespace DbAgnostic
             public bool Insert { get; set; }
             public bool Update { get; set; }
             public bool Select { get; set; }
+            /// <summary>
+            /// Allow use for SelectBy, UpdateBy and DeleteBy methods.
+            /// </summary>
             public bool DoBy { get; set; }
 
             public PropertyConfiguration()

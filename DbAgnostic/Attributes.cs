@@ -2,16 +2,14 @@
 
 namespace DbAgnostic
 {
-    //TODO: document these
-
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class CrudAccessPropertySettingsAttribute : Attribute
     {
         public CrudAccessPropertySettingsAttribute()
         {
-            //default exclusion settings, never update or insert, but always select and be able to select/update by
-            Insert = false;
-            Update = false;
+            //default settings
+            Insert = true;
+            Update = true;
             Select = true;
             DoBy = true;
         }

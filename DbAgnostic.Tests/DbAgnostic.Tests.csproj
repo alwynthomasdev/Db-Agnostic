@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DbAgnostic.MsSQL\DbAgnostic.MsSQL.csproj" />
     <ProjectReference Include="..\DbAgnostic\DbAgnostic.csproj" />
   </ItemGroup>
 
