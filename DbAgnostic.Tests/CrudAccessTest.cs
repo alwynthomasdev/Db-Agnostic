@@ -41,7 +41,7 @@ namespace DbAgnostic.Tests
         public void UpdateTest()
         {
             string uniqueValue = Guid.NewGuid().ToString();
-            TestModel m1 = _dbAccess.Create(new TestModel
+            TestModel original = _dbAccess.Create(new TestModel
             {
                 FirstName = "Test",
                 LastName = uniqueValue,
@@ -49,12 +49,17 @@ namespace DbAgnostic.Tests
                 Bio = "Test bio"
             });
 
-            m1.FirstName = "Updated";
-            TestModel m2 = _dbAccess.Update(m1);
+            TestModel updated = original.Clone();//create a copy, not ref
+            updated.FirstName = "Updated";
 
-            Assert.Equals(m2.UserID, m1.UserID);
-            Assert.Equals(m2.FirstName, "Updated");
-            Assert.AreNotEqual(m2.FirstName, m1.FirstName);
+            updated = _dbAccess.Update(updated);
+
+            Assert.AreEqual(updated.UserID, original.UserID);
+            Assert.AreEqual(updated.FirstName, "Updated");
+            Assert.AreNotEqual(updated.FirstName, original.FirstName);
+
+            //clean up
+            _dbAccess.Delete(updated.UserID);
         }
 
     }

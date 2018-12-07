@@ -25,5 +25,11 @@ namespace DbAgnostic.Tests
             }
         }
 
+        //for testing purposes
+        public TestModel Clone()
+        {
+            return (TestModel)this.MemberwiseClone();
+        }
+
     }
 }

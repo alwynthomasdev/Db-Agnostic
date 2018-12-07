@@ -40,9 +40,9 @@ namespace DbAgnostic
             }
 
             sb.AppendLine("FROM");
-            sb.AppendFormat("[{0}]", TableName);
+            sb.AppendFormat("{0}[{1}]\n", TAB, TableName);
             sb.AppendLine("WHERE");
-            sb.AppendFormat("{0} [{1}] = @ID", TAB, KeyColumnName);
+            sb.AppendFormat("{0}[{1}] = @{1}", TAB, KeyColumnName);
 
             return sb.ToString();
         }
@@ -113,6 +113,9 @@ namespace DbAgnostic
             }
 
             sb.AppendFormat("WHERE [{0}] = @{0}", KeyColumnName);
+
+            sb.Append("\n\n");
+            sb.Append(GenerateSelectByIdSatement());
 
             return sb.ToString();
         }
