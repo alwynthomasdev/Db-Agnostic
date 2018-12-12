@@ -42,7 +42,7 @@ namespace DbAgnostic
             sb.AppendLine("FROM");
             sb.AppendFormat("{0}[{1}]\n", TAB, TableName);
             sb.AppendLine("WHERE");
-            sb.AppendFormat("{0}[{1}] = @{1}", TAB, KeyColumnName);
+            sb.AppendFormat("{0}[{1}] = @ID", TAB, KeyColumnName);
 
             return sb.ToString();
         }
@@ -115,7 +115,23 @@ namespace DbAgnostic
             sb.AppendFormat("WHERE [{0}] = @{0}", KeyColumnName);
 
             sb.Append("\n\n");
-            sb.Append(GenerateSelectByIdSatement());
+
+            //get the newly updated item
+
+            sb.AppendLine("SELECT TOP 1");
+
+            for (int i = 0; i < SelectList.Length; i++)
+            {
+                sb.AppendFormat("{0} [{1}]{2}\n",
+                    TAB,
+                    SelectList[i],
+                    SelectList.Length == i + 1 ? "" : ",");//if its the last property
+            }
+
+            sb.AppendLine("FROM");
+            sb.AppendFormat("{0}[{1}]\n", TAB, TableName);
+            sb.AppendLine("WHERE");
+            sb.AppendFormat("{0}[{1}] = @{1}", TAB, KeyColumnName);
 
             return sb.ToString();
         }
@@ -160,14 +176,47 @@ namespace DbAgnostic
 
         protected override string GenerateUpdateByStatement(string propertyName)
         {
-            //TODO: implement this
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendFormat("UPDATE [{0}]\n SET\n", TableName);
+
+            for (int i = 0; i < UpdateList.Length; i++)
+            {
+                sb.AppendFormat("{2}[{0}] = @{0}{1}\n",
+                    UpdateList[i],
+                    UpdateList.Length == i + 1 ? "" : ",",
+                    TAB);
+            }
+
+            sb.AppendFormat("WHERE [{0}] = @{0}", propertyName);
+
+            sb.Append("\n\n");
+
+            //get the newly updated item
+
+            sb.AppendLine("SELECT TOP 1");
+
+            for (int i = 0; i < SelectList.Length; i++)
+            {
+                sb.AppendFormat("{0} [{1}]{2}\n",
+                    TAB,
+                    SelectList[i],
+                    SelectList.Length == i + 1 ? "" : ",");//if its the last property
+            }
+
+            sb.AppendLine("FROM");
+            sb.AppendFormat("{0}[{1}]\n", TAB, TableName);
+            sb.AppendLine("WHERE");
+            sb.AppendFormat("{0}[{1}] = @{1}", TAB, KeyColumnName);
+
+            return sb.ToString();
         }
 
         protected override string GenerateDeleteByStatement(string propertyName)
         {
-            //TODO: implement this
-            throw new NotImplementedException();
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("DELETE FROM [{0}] WHERE [{1}] = @ID", TableName, propertyName);
+            return sb.ToString();
         }
     }
 }

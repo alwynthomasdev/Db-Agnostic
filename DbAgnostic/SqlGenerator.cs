@@ -204,7 +204,7 @@ namespace DbAgnostic
         private Dictionary<string, string> _DeleteBy;
         public string DeleteByStatement(string propertyName)
         {
-            if (_DeleteBy == null) _UpdateBy = new Dictionary<string, string>();
+            if (_DeleteBy == null) _DeleteBy = new Dictionary<string, string>();
             if (!_DeleteBy.ContainsKey(propertyName))
             {
                 //make sure this property is a valid property to search by
@@ -295,7 +295,7 @@ namespace DbAgnostic
                 if (!cfg.DoBy)
                     throw new DbAccessException($"Property '{propertyName}' cannot be used for 'select/update/delete by' due to CrudAccessPropertySettingsAttribute.");
             }
-            throw new DbAccessException($"Property '{propertyName}' is not a member of the '{typeof(T).Name}' property list.");
+            else throw new DbAccessException($"Property '{propertyName}' is not a member of the '{typeof(T).Name}' property list.");
         }
 
         protected class PropertyConfiguration

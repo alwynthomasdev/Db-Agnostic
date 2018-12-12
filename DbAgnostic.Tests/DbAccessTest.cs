@@ -28,8 +28,8 @@ namespace DbAgnostic.Tests
         {
             IDbConnection con = _dbAccess.GetConnection();
 
-            Assert.IsNotNull(con);
-            Assert.AreEqual(_connectionString, con.ConnectionString);
+            Assert.IsNotNull(con, "The connection string created was NULL.");
+            Assert.AreEqual(_connectionString, con.ConnectionString, "Unexpected connection string.");
         }
 
         [Test]
